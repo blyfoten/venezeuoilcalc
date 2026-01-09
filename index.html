@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="sv">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Venezuelansk olja – enkel ekonomisimulator</title>
+  <title>Venezuelan Oil – Economic Simulator</title>
   <style>
     :root { --gap: 14px; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background:#0b0c10; color:#e9eef6; }
@@ -41,38 +41,38 @@
 </head>
 <body>
 <header>
-  <h1>Venezuelansk olja – ekonomisimulator (sliders)</h1>
+  <h1>Venezuelan Oil – Economic Simulator</h1>
   <p class="muted">
-    Justera antaganden och se resultat: omsättning, kostnader, nettovinst, samt fördelning (befolkning/USA/stat).
-    Modellen använder förenklade antaganden och är till för “what-if”.
+    Adjust assumptions and see results: revenue, costs, net profit, and distribution (population/USA/state).
+    The model uses simplified assumptions and is intended for "what-if" scenarios.
   </p>
 </header>
 
 <main>
   <!-- CONTROLS -->
   <section class="card">
-    <h2>Parametrar</h2>
+    <h2>Parameters</h2>
 
     <div class="row">
-      <label for="bpd">Produktion (fat/dag)</label>
+      <label for="bpd">Production (barrels/day)</label>
       <div class="val" id="bpd_v"></div>
       <input id="bpd" type="range" min="100000" max="3000000" step="50000" value="900000">
     </div>
 
     <div class="row">
-      <label for="price">Marknadspris (USD/fat)</label>
+      <label for="price">Market price (USD/bbl)</label>
       <div class="val" id="price_v"></div>
       <input id="price" type="range" min="30" max="150" step="1" value="75">
     </div>
 
     <div class="row">
-      <label for="exportShare">Andel av produktion som exporteras</label>
+      <label for="exportShare">Share of production exported</label>
       <div class="val" id="exportShare_v"></div>
       <input id="exportShare" type="range" min="0" max="100" step="1" value="85">
     </div>
 
     <div class="row">
-      <label for="discount">Sanktions-/riskrabatt mot spotpris</label>
+      <label for="discount">Sanctions/risk discount vs spot price</label>
       <div class="val" id="discount_v"></div>
       <input id="discount" type="range" min="0" max="40" step="1" value="12">
     </div>
@@ -80,31 +80,31 @@
     <hr style="border:none;border-top:1px solid #232634;margin:14px 0;">
 
     <div class="row">
-      <label for="opex">Lyft-/driftkostnad upstream (USD/fat)</label>
+      <label for="opex">Upstream lifting/operating cost (USD/bbl)</label>
       <div class="val" id="opex_v"></div>
       <input id="opex" type="range" min="3" max="35" step="0.5" value="11">
     </div>
 
     <div class="row">
-      <label for="transport">Transport/försäkring/logistik (USD/fat)</label>
+      <label for="transport">Transport/insurance/logistics (USD/bbl)</label>
       <div class="val" id="transport_v"></div>
       <input id="transport" type="range" min="0" max="20" step="0.5" value="4">
     </div>
 
     <div class="row">
-      <label for="refiningShare">Andel som raffineras i stället för att säljas som råolja</label>
+      <label for="refiningShare">Share refined instead of sold as crude</label>
       <div class="val" id="refiningShare_v"></div>
       <input id="refiningShare" type="range" min="0" max="100" step="1" value="20">
     </div>
 
     <div class="row">
-      <label for="refiningCost">Raffinaderidrift (USD/fat raffinerat)</label>
+      <label for="refiningCost">Refinery operation (USD/bbl refined)</label>
       <div class="val" id="refiningCost_v"></div>
       <input id="refiningCost" type="range" min="0" max="30" step="0.5" value="6">
     </div>
 
     <div class="row">
-      <label for="refiningMargin">Raffinaderimarginal (USD/fat raffinerat)</label>
+      <label for="refiningMargin">Refining margin (USD/bbl refined)</label>
       <div class="val" id="refiningMargin_v"></div>
       <input id="refiningMargin" type="range" min="-10" max="35" step="0.5" value="8">
     </div>
@@ -112,25 +112,25 @@
     <hr style="border:none;border-top:1px solid #232634;margin:14px 0;">
 
     <div class="row">
-      <label for="capex">CAPEX: investering/modernisering (USD/år)</label>
+      <label for="capex">CAPEX: investment/modernization (USD/year)</label>
       <div class="val" id="capex_v"></div>
       <input id="capex" type="range" min="0" max="30000000000" step="250000000" value="6000000000">
     </div>
 
     <div class="row">
-      <label for="infra">Infrastruktur/O&M extra (USD/år)</label>
+      <label for="infra">Infrastructure/O&M extra (USD/year)</label>
       <div class="val" id="infra_v"></div>
       <input id="infra" type="range" min="0" max="10000000000" step="100000000" value="1800000000">
     </div>
 
     <div class="row">
-      <label for="military">Militär närvaro (USD/år, optional)</label>
+      <label for="military">Military presence (USD/year, optional)</label>
       <div class="val" id="military_v"></div>
       <input id="military" type="range" min="0" max="15000000000" step="100000000" value="0">
     </div>
 
     <div class="row">
-      <label for="losses">Förluster/stöld/ineffektivitet (% av produktion)</label>
+      <label for="losses">Losses/theft/inefficiency (% of production)</label>
       <div class="val" id="losses_v"></div>
       <input id="losses" type="range" min="0" max="20" step="0.5" value="5">
     </div>
@@ -138,46 +138,46 @@
     <hr style="border:none;border-top:1px solid #232634;margin:14px 0;">
 
     <div class="row">
-      <label for="popShare">Andel av nettovinst till befolkningen</label>
+      <label for="popShare">Share of net profit to population</label>
       <div class="val" id="popShare_v"></div>
       <input id="popShare" type="range" min="0" max="100" step="1" value="35">
     </div>
 
     <div class="row">
-      <label for="usShare">Andel av nettovinst till USA</label>
+      <label for="usShare">Share of net profit to USA</label>
       <div class="val" id="usShare_v"></div>
       <input id="usShare" type="range" min="0" max="100" step="1" value="25">
     </div>
 
     <div class="row">
-      <label for="stateShare">Andel av nettovinst till venezuelanska staten</label>
+      <label for="stateShare">Share of net profit to Venezuelan state</label>
       <div class="val" id="stateShare_v"></div>
       <input id="stateShare" type="range" min="0" max="100" step="1" value="40">
     </div>
 
     <p class="muted">
-      Tips: Summan av andelar bör bli 100%. Om inte, normaliseras de automatiskt.
+      Tip: Sum of shares should be 100%. If not, they are normalized automatically.
     </p>
 
     <div class="btnrow">
-      <button id="resetBtn">Återställ “baseline”</button>
-      <button id="copyLinkBtn">Kopiera länk med parametrar</button>
+      <button id="resetBtn">Reset to baseline</button>
+      <button id="copyLinkBtn">Copy link with parameters</button>
     </div>
   </section>
 
   <!-- RESULTS -->
   <section class="card">
-    <h2>Resultat</h2>
+    <h2>Results</h2>
 
     <div class="grid2">
       <div class="card kpi">
-        <div class="pill">Årlig netto till USA</div>
+        <div class="pill">Annual net to USA</div>
         <div class="big" id="kpi_us">$0</div>
         <div class="small" id="kpi_us_note"></div>
       </div>
 
       <div class="card kpi">
-        <div class="pill">Årlig nettovinst (total)</div>
+        <div class="pill">Annual net profit (total)</div>
         <div class="big" id="kpi_profit">$0</div>
         <div class="small" id="kpi_profit_note"></div>
       </div>
@@ -185,59 +185,59 @@
 
     <div class="grid2" style="margin-top:14px;">
       <div class="card">
-        <h2>Breakdown (årlig)</h2>
+        <h2>Breakdown (annual)</h2>
         <table>
           <tbody>
-            <tr><td>Exporterade fat</td><td id="t_export_bbl">–</td></tr>
-            <tr><td>Effektivt pris (efter rabatt)</td><td id="t_eff_price">–</td></tr>
-            <tr><td>Omsättning råolja</td><td id="t_rev_crude">–</td></tr>
-            <tr><td>Raffinaderibidrag (marginal)</td><td id="t_ref_profit">–</td></tr>
-            <tr><td><b>Total omsättning + marginal</b></td><td id="t_total_rev"><b>–</b></td></tr>
+            <tr><td>Exported barrels</td><td id="t_export_bbl">–</td></tr>
+            <tr><td>Effective price (after discount)</td><td id="t_eff_price">–</td></tr>
+            <tr><td>Crude oil revenue</td><td id="t_rev_crude">–</td></tr>
+            <tr><td>Refining contribution (margin)</td><td id="t_ref_profit">–</td></tr>
+            <tr><td><b>Total revenue + margin</b></td><td id="t_total_rev"><b>–</b></td></tr>
             <tr><td>Upstream OPEX</td><td id="t_opex">–</td></tr>
-            <tr><td>Transport/logistik</td><td id="t_transport">–</td></tr>
-            <tr><td>Raffinaderikostnad</td><td id="t_ref_cost">–</td></tr>
-            <tr><td>CAPEX (invest/modernisering)</td><td id="t_capex">–</td></tr>
-            <tr><td>Infrastruktur/O&M extra</td><td id="t_infra">–</td></tr>
-            <tr><td>Militär närvaro</td><td id="t_military">–</td></tr>
-            <tr><td><b>Total kostnader</b></td><td id="t_total_cost"><b>–</b></td></tr>
-            <tr><td class="pill">Nettovinst</td><td id="t_net" class="pill">–</td></tr>
+            <tr><td>Transport/logistics</td><td id="t_transport">–</td></tr>
+            <tr><td>Refining cost</td><td id="t_ref_cost">–</td></tr>
+            <tr><td>CAPEX (invest/modernization)</td><td id="t_capex">–</td></tr>
+            <tr><td>Infrastructure/O&M extra</td><td id="t_infra">–</td></tr>
+            <tr><td>Military presence</td><td id="t_military">–</td></tr>
+            <tr><td><b>Total costs</b></td><td id="t_total_cost"><b>–</b></td></tr>
+            <tr><td class="pill">Net profit</td><td id="t_net" class="pill">–</td></tr>
           </tbody>
         </table>
         <p class="muted" id="healthNote">–</p>
       </div>
 
       <div class="card">
-        <h2>Fördelning av nettovinst</h2>
+        <h2>Distribution of net profit</h2>
         <canvas id="pie" width="400" height="400"></canvas>
         <table style="margin-top:10px;">
           <tbody>
-            <tr><td>Befolkning</td><td id="alloc_pop">–</td></tr>
+            <tr><td>Population</td><td id="alloc_pop">–</td></tr>
             <tr><td>USA</td><td id="alloc_us">–</td></tr>
-            <tr><td>Venezuelanska staten</td><td id="alloc_state">–</td></tr>
+            <tr><td>Venezuelan state</td><td id="alloc_state">–</td></tr>
           </tbody>
         </table>
         <p class="muted">
-          Om nettovinsten är negativ blir fördelningen negativ (underskott) – vilket kan vara nyttigt för att se när antagandena inte går ihop.
+          If net profit is negative, the distribution becomes negative (deficit) – which can be useful to see when assumptions don't add up.
         </p>
       </div>
     </div>
 
     <div class="card" style="margin-top:14px;">
-      <h2>Känslighet: pris per fat</h2>
+      <h2>Sensitivity: price per barrel</h2>
       <canvas id="line" width="900" height="320"></canvas>
       <p class="muted">
-        Visar USA-netto och total nettovinst om priset varierar ±30% runt ditt val (övriga parametrar fasta).
+        Shows USA net and total net profit if price varies ±30% around your selection (other parameters fixed).
       </p>
     </div>
 
     <div class="card" style="margin-top:14px;">
-      <h2>Modellantaganden</h2>
+      <h2>Model assumptions</h2>
       <ul class="muted" style="margin:0; padding-left:18px;">
-        <li>Exporterade volymer = produktion × exportandel × (1 − förluster).</li>
-        <li>Effektivt pris = marknadspris × (1 − rabatt).</li>
-        <li>Raffinaderibidrag: (raffinaderimarginal − raffinaderikostnad) × raffinerade fat.</li>
-        <li>Totalkostnader = upstream OPEX + transport + raffinaderikostnad + CAPEX + infrastruktur + militär närvaro.</li>
-        <li>Andelar normaliseras om de inte summerar till 100%.</li>
+        <li>Exported volumes = production × export share × (1 − losses).</li>
+        <li>Effective price = market price × (1 − discount).</li>
+        <li>Refining contribution: (refining margin − refining cost) × refined barrels.</li>
+        <li>Total costs = upstream OPEX + transport + refining cost + CAPEX + infrastructure + military presence.</li>
+        <li>Shares are normalized if they don't sum to 100%.</li>
       </ul>
     </div>
   </section>
@@ -281,7 +281,7 @@
     return `${sign}$${x.toFixed(2)}`;
   }
   function fmtNum(x){
-    return x.toLocaleString("sv-SE");
+    return x.toLocaleString("en-US");
   }
   function fmtPct(x){
     return `${x.toFixed(1)}%`;
@@ -377,9 +377,9 @@
     ctx.clearRect(0,0,w,h);
 
     const values = [
-      { name: "Befolkning", v: res.pop },
+      { name: "Population", v: res.pop },
       { name: "USA", v: res.us },
-      { name: "Staten", v: res.state }
+      { name: "State", v: res.state }
     ];
 
     const absSum = values.reduce((a,x)=>a+Math.abs(x.v),0) || 1;
@@ -417,7 +417,7 @@
     if (res.net < 0){
       ctx.fillStyle = "rgba(255,208,138,.95)";
       ctx.font = "11px system-ui, -apple-system, Segoe UI, Roboto, Arial";
-      ctx.fillText("Notis: Nettovinsten är negativ (underskott)", 30, 380);
+      ctx.fillText("Notice: Net profit is negative (deficit)", 30, 380);
     }
   }
 
@@ -491,17 +491,17 @@
 
     // legend
     ctx.fillStyle = "rgba(233,238,246,.92)";
-    ctx.fillText("Total nettovinst", x0+8, y1+16);
+    ctx.fillText("Total net profit", x0+8, y1+16);
     ctx.fillStyle = `hsl(200 70% 55%)`;
     ctx.fillRect(x0+130, y1+6, 14, 14);
 
     ctx.fillStyle = "rgba(233,238,246,.92)";
-    ctx.fillText("USA netto", x0+170, y1+16);
+    ctx.fillText("USA net", x0+170, y1+16);
     ctx.fillStyle = `hsl(20 70% 55%)`;
     ctx.fillRect(x0+242, y1+6, 14, 14);
 
     ctx.fillStyle = "rgba(233,238,246,.75)";
-    ctx.fillText(`Pris (USD/fat) ~ ${minP.toFixed(0)} → ${maxP.toFixed(0)}`, x0, h-12);
+    ctx.fillText(`Price (USD/bbl) ~ ${minP.toFixed(0)} → ${maxP.toFixed(0)}`, x0, h-12);
   }
 
   function update(){
@@ -514,8 +514,8 @@
     $("kpi_profit").textContent = fmtUSD(res.net);
 
     const perDayExport = res.exported / 365;
-    $("kpi_profit_note").textContent = `Export ≈ ${fmtNum(Math.round(perDayExport))} fat/dag. Effektivt pris: $${res.effPrice.toFixed(2)}/fat.`;
-    $("kpi_us_note").textContent = `USA-andel: ${res.shares.us.toFixed(1)}% av nettovinst.`;
+    $("kpi_profit_note").textContent = `Export ≈ ${fmtNum(Math.round(perDayExport))} bbl/day. Effective price: $${res.effPrice.toFixed(2)}/bbl.`;
+    $("kpi_us_note").textContent = `USA share: ${res.shares.us.toFixed(1)}% of net profit.`;
 
     $("t_export_bbl").textContent = fmtNum(Math.round(res.exported));
     $("t_eff_price").textContent = `$${res.effPrice.toFixed(2)}`;
@@ -538,11 +538,11 @@
     $("alloc_state").textContent = fmtUSD(res.state);
 
     const margin = res.totalRev !== 0 ? (res.net / res.totalRev) : 0;
-    let cls = "ok", msg = "Ser positivt ut.";
-    if (res.net < 0){ cls = "bad"; msg = "Underskott – justera pris/volym eller sänk kostnader/CAPEX."; }
-    else if (margin < 0.10){ cls = "warn"; msg = "Tunn marginal – modellen är känslig för pris/volym/kostnader."; }
+    let cls = "ok", msg = "Looks positive.";
+    if (res.net < 0){ cls = "bad"; msg = "Deficit – adjust price/volume or reduce costs/CAPEX."; }
+    else if (margin < 0.10){ cls = "warn"; msg = "Thin margin – model is sensitive to price/volume/costs."; }
 
-    $("healthNote").innerHTML = `Status: <span class="${cls}">${msg}</span> Nettomarginal ≈ ${fmtPct(margin*100)}.`;
+    $("healthNote").innerHTML = `Status: <span class="${cls}">${msg}</span> Net margin ≈ ${fmtPct(margin*100)}.`;
 
     drawPie(res);
     drawLine(p);
@@ -574,9 +574,9 @@
     const link = toQuery();
     try {
       await navigator.clipboard.writeText(link);
-      alert("Länk kopierad till urklipp!");
+      alert("Link copied to clipboard!");
     } catch {
-      prompt("Kopiera länken manuellt:", link);
+      prompt("Copy link manually:", link);
     }
   });
 

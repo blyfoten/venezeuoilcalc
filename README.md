@@ -1,50 +1,50 @@
-# Venezuelansk olja – ekonomisimulator
+# Venezuelan Oil – Economic Simulator
 
-En interaktiv ekonomisimulator för att analysera potentiella intäkter och kostnader från Venezuelas oljeproduktion.
+An interactive economic simulator for analyzing potential revenues and costs from Venezuelan oil production.
 
 [Try It!](https://html-preview.github.io/?url=https://github.com/blyfoten/venezeuoilcalc/raw/refs/heads/main/index.html)
 
-## Funktioner
+## Features
 
-Simulatorn låter dig justera olika parametrar och se realtidsresultat:
+The simulator lets you adjust various parameters and see real-time results:
 
-### Produktionsparametrar
-- **Produktion**: Antal fat per dag (100k - 3M fat/dag)
-- **Marknadspris**: USD per fat ($30-$150)
-- **Exportandel**: Andel av produktion som exporteras (0-100%)
-- **Sanktionsrabatt**: Rabatt mot spotpris på grund av sanktioner/risk (0-40%)
+### Production Parameters
+- **Production**: Barrels per day (100k - 3M bbl/day)
+- **Market Price**: USD per barrel ($30-$150)
+- **Export Share**: Share of production that is exported (0-100%)
+- **Sanctions Discount**: Discount against spot price due to sanctions/risk (0-40%)
 
-### Kostnadsparametrar
-- **Upstream OPEX**: Lyft- och driftkostnad ($3-$35/fat)
-- **Transport**: Transport, försäkring och logistik ($0-$20/fat)
-- **Raffinering**: Andel som raffineras, kostnad och marginal
-- **CAPEX**: Investeringar och modernisering (årlig kostnad)
-- **Infrastruktur**: Extra underhåll och drift (årlig kostnad)
-- **Militär närvaro**: Optional kostnad för militär närvaro i Venezuela (årlig kostnad)
-- **Förluster**: Förluster genom stöld och ineffektivitet (0-20%)
+### Cost Parameters
+- **Upstream OPEX**: Lifting and operating cost ($3-$35/bbl)
+- **Transport**: Transportation, insurance and logistics ($0-$20/bbl)
+- **Refining**: Share that is refined, cost and margin
+- **CAPEX**: Investment and modernization (annual cost)
+- **Infrastructure**: Extra maintenance and operations (annual cost)
+- **Military Presence**: Optional cost for military presence in Venezuela (annual cost)
+- **Losses**: Losses through theft and inefficiency (0-20%)
 
-### Fördelningsparametrar
-- **Befolkning**: Andel av nettovinst till befolkningen (%)
-- **USA**: Andel av nettovinst till USA (%)
-- **Staten**: Andel av nettovinst till venezuelanska staten (%)
+### Distribution Parameters
+- **Population**: Share of net profit to the population (%)
+- **USA**: Share of net profit to USA (%)
+- **State**: Share of net profit to Venezuelan state (%)
 
-## Resultat
+## Results
 
-Simulatorn visar:
-- **KPIs**: Årlig netto till USA och total nettovinst
-- **Breakdown**: Detaljerad uppdelning av intäkter och kostnader
-- **Fördelning**: Visualisering av hur nettovinsten fördelas (cirkeldiagram)
-- **Känslighetsanalys**: Graf som visar hur prisvariationer påverkar resultaten
+The simulator displays:
+- **KPIs**: Annual net to USA and total net profit
+- **Breakdown**: Detailed breakdown of revenues and costs
+- **Distribution**: Visualization of how net profit is distributed (pie chart)
+- **Sensitivity Analysis**: Graph showing how price variations affect results
 
-## URL-delning
+## URL Sharing
 
-Du kan spara och dela dina parametrar genom att kopiera länken med "Kopiera länk med parametrar"-knappen. Alla parametrar sparas i URL:en så att andra kan se samma scenario.
+You can save and share your parameters by copying the link with the "Copy link with parameters" button. All parameters are saved in the URL so others can see the same scenario.
 
-## Antaganden
+## Assumptions
 
-Modellen använder förenklade antaganden och är till för "what-if"-analyser:
-- Exporterade volymer = produktion × exportandel × (1 − förluster)
-- Effektivt pris = marknadspris × (1 − rabatt)
-- Raffinaderibidrag: (raffinaderimarginal − raffinaderikostnad) × raffinerade fat
-- Totalkostnader = upstream OPEX + transport + raffinaderikostnad + CAPEX + infrastruktur + militär närvaro
-- Andelar normaliseras om de inte summerar till 100%
+The model uses simplified assumptions and is intended for "what-if" analyses:
+- Exported volumes = production × export share × (1 − losses)
+- Effective price = market price × (1 − discount)
+- Refining contribution: (refining margin − refining cost) × refined barrels
+- Total costs = upstream OPEX + transport + refining cost + CAPEX + infrastructure + military presence
+- Shares are normalized if they don't sum to 100%
