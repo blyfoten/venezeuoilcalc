@@ -28,7 +28,8 @@
     td { padding: 8px 6px; border-bottom: 1px solid #232634; }
     td:last-child { text-align:right; font-variant-numeric: tabular-nums; }
     .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border:1px solid #2a2f41; background:#0e1017; font-size: 12px; opacity:.9; }
-    canvas { width:100%; height:260px; background:#0e1017; border:1px solid #232634; border-radius: 12px; }
+    canvas { width:100%; height:auto; background:#0e1017; border:1px solid #232634; border-radius: 12px; }
+    #pie { max-width: 400px; max-height: 400px; margin: 0 auto; display: block; }
     .warn { color:#ffd08a; }
     .ok { color:#b6ffbf; }
     .bad { color:#ff9aa8; }
@@ -207,7 +208,7 @@
 
       <div class="card">
         <h2>Fördelning av nettovinst</h2>
-        <canvas id="pie" width="600" height="320"></canvas>
+        <canvas id="pie" width="400" height="400"></canvas>
         <table style="margin-top:10px;">
           <tbody>
             <tr><td>Befolkning</td><td id="alloc_pop">–</td></tr>
@@ -384,7 +385,7 @@
     const absSum = values.reduce((a,x)=>a+Math.abs(x.v),0) || 1;
 
     let start = -Math.PI/2;
-    const cx = 160, cy = 160, r = 115;
+    const cx = 200, cy = 200, r = 130;
 
     values.forEach((x, i) => {
       const frac = Math.abs(x.v) / absSum;
@@ -398,23 +399,25 @@
       start = end;
     });
 
-    // legend
-    ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
-    ctx.fillStyle = "rgba(233,238,246,.9)";
-    const lx = 320, ly = 65;
+    // legend - kompakt layout under cirkeln
+    ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+    const ly = 355;
+    const colWidth = 130;
+
     values.forEach((x, i) => {
-      const y = ly + i*28;
+      const lx = 5 + i * colWidth;
       ctx.fillStyle = `hsl(${(i*120 + 30)%360} 60% 45%)`;
-      ctx.fillRect(lx, y-12, 16, 16);
+      ctx.fillRect(lx, ly-10, 12, 12);
       ctx.fillStyle = "rgba(233,238,246,.92)";
       const share = [res.shares.pop,res.shares.us,res.shares.state][i];
-      const label = `${x.name}: ${fmtUSD(x.v)} (${share.toFixed(1)}%)`;
-      ctx.fillText(label, lx+24, y+1);
+      const label = `${x.name} ${share.toFixed(0)}%`;
+      ctx.fillText(label, lx+18, ly);
     });
 
     if (res.net < 0){
       ctx.fillStyle = "rgba(255,208,138,.95)";
-      ctx.fillText("Notis: Nettovinsten är negativ (underskott).", 320, 170);
+      ctx.font = "11px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+      ctx.fillText("Notis: Nettovinsten är negativ (underskott)", 30, 380);
     }
   }
 
