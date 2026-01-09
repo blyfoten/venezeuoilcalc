@@ -123,7 +123,13 @@
     </div>
 
     <div class="row">
-      <label for="losses">Förluster/stöld/ineffektivitet</label>
+      <label for="military">Militär närvaro (USD/år, optional)</label>
+      <div class="val" id="military_v"></div>
+      <input id="military" type="range" min="0" max="15000000000" step="100000000" value="0">
+    </div>
+
+    <div class="row">
+      <label for="losses">Förluster/stöld/ineffektivitet (% av produktion)</label>
       <div class="val" id="losses_v"></div>
       <input id="losses" type="range" min="0" max="20" step="0.5" value="5">
     </div>
@@ -191,6 +197,7 @@
             <tr><td>Raffinaderikostnad</td><td id="t_ref_cost">–</td></tr>
             <tr><td>CAPEX (invest/modernisering)</td><td id="t_capex">–</td></tr>
             <tr><td>Infrastruktur/O&M extra</td><td id="t_infra">–</td></tr>
+            <tr><td>Militär närvaro</td><td id="t_military">–</td></tr>
             <tr><td><b>Total kostnader</b></td><td id="t_total_cost"><b>–</b></td></tr>
             <tr><td class="pill">Nettovinst</td><td id="t_net" class="pill">–</td></tr>
           </tbody>
@@ -228,7 +235,7 @@
         <li>Exporterade volymer = produktion × exportandel × (1 − förluster).</li>
         <li>Effektivt pris = marknadspris × (1 − rabatt).</li>
         <li>Raffinaderibidrag: (raffinaderimarginal − raffinaderikostnad) × raffinerade fat.</li>
-        <li>Totalkostnader = upstream OPEX + transport + raffinaderikostnad + CAPEX + infrastruktur.</li>
+        <li>Totalkostnader = upstream OPEX + transport + raffinaderikostnad + CAPEX + infrastruktur + militär närvaro.</li>
         <li>Andelar normaliseras om de inte summerar till 100%.</li>
       </ul>
     </div>
@@ -241,7 +248,7 @@
   const sliders = [
     "bpd","price","exportShare","discount","opex","transport",
     "refiningShare","refiningCost","refiningMargin",
-    "capex","infra","losses",
+    "capex","infra","military","losses",
     "popShare","usShare","stateShare"
   ];
 
@@ -257,6 +264,7 @@
     refiningMargin: 8,
     capex: 6000000000,
     infra: 1800000000,
+    military: 0,
     losses: 5,
     popShare: 35,
     usShare: 25,
@@ -322,8 +330,9 @@
 
     const capex = p.capex;
     const infra = p.infra;
+    const military = p.military;
 
-    const totalCost = upstreamOpex + transport + refCost + capex + infra;
+    const totalCost = upstreamOpex + transport + refCost + capex + infra + military;
     const net = totalRev - totalCost;
 
     const pop = net * (p.popShare/100);
@@ -333,7 +342,7 @@
     return {
       produced, exported, refinedBbl, crudeSoldBbl,
       effPrice, revCrude, refProfit, totalRev,
-      upstreamOpex, transport, refCost, capex, infra,
+      upstreamOpex, transport, refCost, capex, infra, military,
       totalCost, net, pop, us, state,
       shares: { pop: p.popShare, us: p.usShare, state: p.stateShare }
     };
@@ -351,6 +360,7 @@
     $("refiningMargin_v").textContent = `$${p.refiningMargin.toFixed(1)}`;
     $("capex_v").textContent = fmtUSD(p.capex);
     $("infra_v").textContent = fmtUSD(p.infra);
+    $("military_v").textContent = fmtUSD(p.military);
     $("losses_v").textContent = `${p.losses.toFixed(1)}%`;
 
     // visa normaliserade andelar i UI också
@@ -516,6 +526,7 @@
     $("t_ref_cost").textContent = fmtUSD(res.refCost);
     $("t_capex").textContent = fmtUSD(res.capex);
     $("t_infra").textContent = fmtUSD(res.infra);
+    $("t_military").textContent = fmtUSD(res.military);
     $("t_total_cost").textContent = fmtUSD(res.totalCost);
     $("t_net").textContent = fmtUSD(res.net);
 
