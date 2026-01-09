@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Venezuelansk olja – enkel ekonomisimulator</title>
+  <style>
+    :root { --gap: 14px; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background:#0b0c10; color:#e9eef6; }
+    header { padding: 18px 18px 10px; border-bottom: 1px solid #232634; background: #0e1017; position: sticky; top:0; }
+    h1 { margin: 0 0 6px; font-size: 18px; }
+    p { margin: 6px 0; opacity: .9; line-height: 1.35; }
+    main { display: grid; grid-template-columns: 420px 1fr; gap: var(--gap); padding: 18px; }
+    @media (max-width: 980px){ main { grid-template-columns: 1fr; } }
+
+    .card { background:#111522; border: 1px solid #232634; border-radius: 14px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .card h2 { margin: 0 0 10px; font-size: 14px; opacity: .95; letter-spacing:.2px; text-transform: uppercase; }
+    .row { display: grid; grid-template-columns: 1fr 110px; gap: 10px; align-items: center; margin: 10px 0; }
+    label { font-size: 13px; opacity: .95; }
+    input[type="range"] { width: 100%; }
+    .val { text-align:right; font-variant-numeric: tabular-nums; font-size: 13px; }
+    .muted { opacity: .75; font-size: 12px; }
+    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+    .kpi { display:grid; gap: 8px; }
+    .kpi .big { font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; }
+    .kpi .small { opacity: .75; font-size: 12px; }
+    table { width:100%; border-collapse: collapse; font-size: 13px; }
+    td { padding: 8px 6px; border-bottom: 1px solid #232634; }
+    td:last-child { text-align:right; font-variant-numeric: tabular-nums; }
+    .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border:1px solid #2a2f41; background:#0e1017; font-size: 12px; opacity:.9; }
+    canvas { width:100%; height:260px; background:#0e1017; border:1px solid #232634; border-radius: 12px; }
+    .warn { color:#ffd08a; }
+    .ok { color:#b6ffbf; }
+    .bad { color:#ff9aa8; }
+    .btnrow { display:flex; gap:10px; flex-wrap: wrap; }
+    button { background:#1b2140; color:#e9eef6; border:1px solid #2a2f41; padding:9px 12px; border-radius: 10px; cursor:pointer; }
+    button:hover { filter: brightness(1.08); }
+    code { background:#0e1017; padding:2px 6px; border-radius:8px; border:1px solid #232634; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Venezuelansk olja – ekonomisimulator (sliders)</h1>
+  <p class="muted">
+    Justera antaganden och se resultat: omsättning, kostnader, nettovinst, samt fördelning (befolkning/USA/stat).
+    Modellen använder förenklade antaganden och är till för “what-if”.
+  </p>
+</header>
+
+<main>
+  <!-- CONTROLS -->
+  <section class="card">
+    <h2>Parametrar</h2>
+
+    <div class="row">
+      <label for="bpd">Produktion (fat/dag)</label>
+      <div class="val" id="bpd_v"></div>
+      <input id="bpd" type="range" min="100000" max="3000000" step="50000" value="900000">
+    </div>
+
+    <div class="row">
+      <label for="price">Marknadspris (USD/fat)</label>
+      <div class="val" id="price_v"></div>
+      <input id="price" type="range" min="30" max="150" step="1" value="75">
+    </div>
+
+    <div class="row">
+      <label for="exportShare">Andel av produktion som exporteras</label>
+      <div class="val" id="exportShare_v"></div>
+      <input id="exportShare" type="range" min="0" max="100" step="1" value="85">
+    </div>
+
+    <div class="row">
+      <label for="discount">Sanktions-/riskrabatt mot spotpris</label>
+      <div class="val" id="discount_v"></div>
+      <input id="discount" type="range" min="0" max="40" step="1" value="12">
+    </div>
+
+    <hr style="border:none;border-top:1px solid #232634;margin:14px 0;">
+
+    <div class="row">
+      <label for="opex">Lyft-/driftkostnad upstream (USD/fat)</label>
+      <div class="val" id="opex_v"></div>
+      <input id="opex" type="range" min="3" max="35" step="0.5" value="11">
+    </div>
+
+    <div class="row">
+      <label for="transport">Transport/försäkring/logistik (USD/fat)</label>
+      <div class="val" id="transport_v"></div>
+      <input id="transport" type="range" min="0" max="20" step="0.5" value="4">
+    </div>
+
+    <div class="row">
+      <label for="refiningShare">Andel som raffineras i stället för att säljas som råolja</label>
+      <div class="val" id="refiningShare_v"></div>
+      <input id="refiningShare" type="range" min="0" max="100" step="1" value="20">
+    </div>
+
+    <div class="row">
+      <label for="refiningCost">Raffinaderidrift (USD/fat raffinerat)</label>
+      <div class="val" id="refiningCost_v"></div>
+      <input id="refiningCost" type="range" min="0" max="30" step="0.5" value="6">
+    </div>
+
+    <div class="row">
+      <label for="refiningMargin">Raffinaderimarginal (USD/fat raffinerat)</label>
+      <div class="val" id="refiningMargin_v"></div>
+      <input id="refiningMargin" type="range" min="-10" max="35" step="0.5" value="8">
+    </div>
+
+    <hr style="border:none;border-top:1px solid #232634;margin:14px 0;">
+
+    <div class="row">
+      <label for="capex">CAPEX: investering/modernisering (USD/år)</label>
+      <div class="val" id="capex_v"></div>
+      <input id="capex" type="range" min="0" max="30000000000" step="250000000" value="6000000000">
+    </div>
+
+    <div class="row">
+      <label for="infra">Infrastruktur/O&M extra (USD/år)</label>
+      <div class="val" id="infra_v"></div>
+      <input id="infra" type="range" min="0" max="10000000000" step="100000000" value="1800000000">
+    </div>
+
+    <div class="row">
+      <label for="losses">Förluster/stöld/ineffektivitet</label>
+      <div class="val" id="losses_v"></div>
+      <input id="losses" type="range" min="0" max="20" step="0.5" value="5">
+    </div>
+
+    <hr style="border:none;border-top:1px solid #232634;margin:14px 0;">
+
+    <div class="row">
+      <label for="popShare">Andel av nettovinst till befolkningen</label>
+      <div class="val" id="popShare_v"></div>
+      <input id="popShare" type="range" min="0" max="100" step="1" value="35">
+    </div>
+
+    <div class="row">
+      <label for="usShare">Andel av nettovinst till USA</label>
+      <div class="val" id="usShare_v"></div>
+      <input id="usShare" type="range" min="0" max="100" step="1" value="25">
+    </div>
+
+    <div class="row">
+      <label for="stateShare">Andel av nettovinst till venezuelanska staten</label>
+      <div class="val" id="stateShare_v"></div>
+      <input id="stateShare" type="range" min="0" max="100" step="1" value="40">
+    </div>
+
+    <p class="muted">
+      Tips: Summan av andelar bör bli 100%. Om inte, normaliseras de automatiskt.
+    </p>
+
+    <div class="btnrow">
+      <button id="resetBtn">Återställ “baseline”</button>
+      <button id="copyLinkBtn">Kopiera länk med parametrar</button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="card">
+    <h2>Resultat</h2>
+
+    <div class="grid2">
+      <div class="card kpi">
+        <div class="pill">Årlig netto till USA</div>
+        <div class="big" id="kpi_us">$0</div>
+        <div class="small" id="kpi_us_note"></div>
+      </div>
+
+      <div class="card kpi">
+        <div class="pill">Årlig nettovinst (total)</div>
+        <div class="big" id="kpi_profit">$0</div>
+        <div class="small" id="kpi_profit_note"></div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:14px;">
+      <div class="card">
+        <h2>Breakdown (årlig)</h2>
+        <table>
+          <tbody>
+            <tr><td>Exporterade fat</td><td id="t_export_bbl">–</td></tr>
+            <tr><td>Effektivt pris (efter rabatt)</td><td id="t_eff_price">–</td></tr>
+            <tr><td>Omsättning råolja</td><td id="t_rev_crude">–</td></tr>
+            <tr><td>Raffinaderibidrag (marginal)</td><td id="t_ref_profit">–</td></tr>
+            <tr><td><b>Total omsättning + marginal</b></td><td id="t_total_rev"><b>–</b></td></tr>
+            <tr><td>Upstream OPEX</td><td id="t_opex">–</td></tr>
+            <tr><td>Transport/logistik</td><td id="t_transport">–</td></tr>
+            <tr><td>Raffinaderikostnad</td><td id="t_ref_cost">–</td></tr>
+            <tr><td>CAPEX (invest/modernisering)</td><td id="t_capex">–</td></tr>
+            <tr><td>Infrastruktur/O&M extra</td><td id="t_infra">–</td></tr>
+            <tr><td><b>Total kostnader</b></td><td id="t_total_cost"><b>–</b></td></tr>
+            <tr><td class="pill">Nettovinst</td><td id="t_net" class="pill">–</td></tr>
+          </tbody>
+        </table>
+        <p class="muted" id="healthNote">–</p>
+      </div>
+
+      <div class="card">
+        <h2>Fördelning av nettovinst</h2>
+        <canvas id="pie" width="600" height="320"></canvas>
+        <table style="margin-top:10px;">
+          <tbody>
+            <tr><td>Befolkning</td><td id="alloc_pop">–</td></tr>
+            <tr><td>USA</td><td id="alloc_us">–</td></tr>
+            <tr><td>Venezuelanska staten</td><td id="alloc_state">–</td></tr>
+          </tbody>
+        </table>
+        <p class="muted">
+          Om nettovinsten är negativ blir fördelningen negativ (underskott) – vilket kan vara nyttigt för att se när antagandena inte går ihop.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h2>Känslighet: pris per fat</h2>
+      <canvas id="line" width="900" height="320"></canvas>
+      <p class="muted">
+        Visar USA-netto och total nettovinst om priset varierar ±30% runt ditt val (övriga parametrar fasta).
+      </p>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h2>Modellantaganden</h2>
+      <ul class="muted" style="margin:0; padding-left:18px;">
+        <li>Exporterade volymer = produktion × exportandel × (1 − förluster).</li>
+        <li>Effektivt pris = marknadspris × (1 − rabatt).</li>
+        <li>Raffinaderibidrag: (raffinaderimarginal − raffinaderikostnad) × raffinerade fat.</li>
+        <li>Totalkostnader = upstream OPEX + transport + raffinaderikostnad + CAPEX + infrastruktur.</li>
+        <li>Andelar normaliseras om de inte summerar till 100%.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  const sliders = [
+    "bpd","price","exportShare","discount","opex","transport",
+    "refiningShare","refiningCost","refiningMargin",
+    "capex","infra","losses",
+    "popShare","usShare","stateShare"
+  ];
+
+  const baseline = {
+    bpd: 900000,
+    price: 75,
+    exportShare: 85,
+    discount: 12,
+    opex: 11,
+    transport: 4,
+    refiningShare: 20,
+    refiningCost: 6,
+    refiningMargin: 8,
+    capex: 6000000000,
+    infra: 1800000000,
+    losses: 5,
+    popShare: 35,
+    usShare: 25,
+    stateShare: 40
+  };
+
+  function fmtUSD(x){
+    const sign = x < 0 ? "-" : "";
+    x = Math.abs(x);
+    if (x >= 1e9) return `${sign}$${(x/1e9).toFixed(2)}B`;
+    if (x >= 1e6) return `${sign}$${(x/1e6).toFixed(2)}M`;
+    if (x >= 1e3) return `${sign}$${(x/1e3).toFixed(2)}k`;
+    return `${sign}$${x.toFixed(2)}`;
+  }
+  function fmtNum(x){
+    return x.toLocaleString("sv-SE");
+  }
+  function fmtPct(x){
+    return `${x.toFixed(1)}%`;
+  }
+
+  function getParams(){
+    const p = {};
+    for (const id of sliders) p[id] = parseFloat($(id).value);
+
+    // Normalisera andelar om de inte summerar till 100
+    const sum = p.popShare + p.usShare + p.stateShare;
+    if (sum > 0 && Math.abs(sum - 100) > 0.0001){
+      p.popShare = p.popShare * 100 / sum;
+      p.usShare = p.usShare * 100 / sum;
+      p.stateShare = p.stateShare * 100 / sum;
+    }
+    return p;
+  }
+
+  function compute(p){
+    const days = 365;
+
+    const losses = Math.max(0, Math.min(0.20, p.losses/100));
+    const exportShare = Math.max(0, Math.min(1, p.exportShare/100));
+    const refiningShare = Math.max(0, Math.min(1, p.refiningShare/100));
+
+    const produced = p.bpd * days;
+    const exported = produced * exportShare * (1 - losses);
+
+    const effPrice = p.price * (1 - Math.max(0, Math.min(0.40, p.discount/100)));
+
+    // Raffinerade fat (subset av exporterade, förenkling)
+    const refinedBbl = exported * refiningShare;
+    const crudeSoldBbl = exported - refinedBbl;
+
+    const revCrude = crudeSoldBbl * effPrice;
+
+    // Raffinaderi: margin - cost per refined barrel
+    const refUnitNet = (p.refiningMargin - p.refiningCost);
+    const refProfit = refinedBbl * refUnitNet;
+
+    const totalRev = revCrude + refProfit;
+
+    const upstreamOpex = exported * p.opex;
+    const transport = exported * p.transport;
+    const refCost = refinedBbl * p.refiningCost;
+
+    const capex = p.capex;
+    const infra = p.infra;
+
+    const totalCost = upstreamOpex + transport + refCost + capex + infra;
+    const net = totalRev - totalCost;
+
+    const pop = net * (p.popShare/100);
+    const us = net * (p.usShare/100);
+    const state = net * (p.stateShare/100);
+
+    return {
+      produced, exported, refinedBbl, crudeSoldBbl,
+      effPrice, revCrude, refProfit, totalRev,
+      upstreamOpex, transport, refCost, capex, infra,
+      totalCost, net, pop, us, state,
+      shares: { pop: p.popShare, us: p.usShare, state: p.stateShare }
+    };
+  }
+
+  function setValueLabels(p){
+    $("bpd_v").textContent = fmtNum(p.bpd);
+    $("price_v").textContent = `$${p.price.toFixed(0)}`;
+    $("exportShare_v").textContent = `${p.exportShare.toFixed(0)}%`;
+    $("discount_v").textContent = `${p.discount.toFixed(0)}%`;
+    $("opex_v").textContent = `$${p.opex.toFixed(1)}`;
+    $("transport_v").textContent = `$${p.transport.toFixed(1)}`;
+    $("refiningShare_v").textContent = `${p.refiningShare.toFixed(0)}%`;
+    $("refiningCost_v").textContent = `$${p.refiningCost.toFixed(1)}`;
+    $("refiningMargin_v").textContent = `$${p.refiningMargin.toFixed(1)}`;
+    $("capex_v").textContent = fmtUSD(p.capex);
+    $("infra_v").textContent = fmtUSD(p.infra);
+    $("losses_v").textContent = `${p.losses.toFixed(1)}%`;
+
+    // visa normaliserade andelar i UI också
+    $("popShare_v").textContent = `${p.popShare.toFixed(1)}%`;
+    $("usShare_v").textContent = `${p.usShare.toFixed(1)}%`;
+    $("stateShare_v").textContent = `${p.stateShare.toFixed(1)}%`;
+  }
+
+  function drawPie(res){
+    const canvas = $("pie");
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+
+    const values = [
+      { name: "Befolkning", v: res.pop },
+      { name: "USA", v: res.us },
+      { name: "Staten", v: res.state }
+    ];
+
+    const absSum = values.reduce((a,x)=>a+Math.abs(x.v),0) || 1;
+
+    let start = -Math.PI/2;
+    const cx = 160, cy = 160, r = 115;
+
+    values.forEach((x, i) => {
+      const frac = Math.abs(x.v) / absSum;
+      const end = start + frac * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, start, end);
+      ctx.closePath();
+      ctx.fillStyle = `hsl(${(i*120 + 30)%360} 60% 45%)`;
+      ctx.fill();
+      start = end;
+    });
+
+    // legend
+    ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+    ctx.fillStyle = "rgba(233,238,246,.9)";
+    const lx = 320, ly = 65;
+    values.forEach((x, i) => {
+      const y = ly + i*28;
+      ctx.fillStyle = `hsl(${(i*120 + 30)%360} 60% 45%)`;
+      ctx.fillRect(lx, y-12, 16, 16);
+      ctx.fillStyle = "rgba(233,238,246,.92)";
+      const share = [res.shares.pop,res.shares.us,res.shares.state][i];
+      const label = `${x.name}: ${fmtUSD(x.v)} (${share.toFixed(1)}%)`;
+      ctx.fillText(label, lx+24, y+1);
+    });
+
+    if (res.net < 0){
+      ctx.fillStyle = "rgba(255,208,138,.95)";
+      ctx.fillText("Notis: Nettovinsten är negativ (underskott).", 320, 170);
+    }
+  }
+
+  function drawLine(baseParams){
+    const canvas = $("line");
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+
+    const pad = 46;
+    const x0 = pad, y0 = h - pad, x1 = w - pad, y1 = pad;
+
+    const basePrice = baseParams.price;
+    const minP = basePrice * 0.7;
+    const maxP = basePrice * 1.3;
+    const n = 30;
+
+    const pts = [];
+    for (let i=0;i<=n;i++){
+      const price = minP + (maxP-minP)*i/n;
+      const p = {...baseParams, price};
+      const r = compute(p);
+      pts.push({ price, net: r.net, us: r.us });
+    }
+
+    const minY = Math.min(...pts.map(p=>Math.min(p.net,p.us)));
+    const maxY = Math.max(...pts.map(p=>Math.max(p.net,p.us)));
+    const yMin = minY === maxY ? minY-1 : minY;
+    const yMax = minY === maxY ? maxY+1 : maxY;
+
+    const xScale = (x1-x0) / (maxP - minP);
+    const yScale = (y0-y1) / (yMax - yMin);
+
+    const x = (price) => x0 + (price - minP) * xScale;
+    const y = (val) => y0 - (val - yMin) * yScale;
+
+    // axes
+    ctx.strokeStyle = "rgba(233,238,246,.25)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x0,y0); ctx.lineTo(x1,y0);
+    ctx.moveTo(x0,y0); ctx.lineTo(x0,y1);
+    ctx.stroke();
+
+    // grid + labels
+    ctx.fillStyle = "rgba(233,238,246,.75)";
+    ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+
+    for (let k=0;k<=4;k++){
+      const yy = y0 - (y0-y1)*k/4;
+      const val = yMin + (yMax-yMin)*k/4;
+      ctx.strokeStyle = "rgba(233,238,246,.10)";
+      ctx.beginPath(); ctx.moveTo(x0,yy); ctx.lineTo(x1,yy); ctx.stroke();
+      ctx.fillText(fmtUSD(val), 6, yy+4);
+    }
+
+    function drawSeries(key, hue){
+      ctx.strokeStyle = `hsl(${hue} 70% 55%)`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      pts.forEach((p, i) => {
+        const xx = x(p.price);
+        const yy = y(p[key]);
+        if (i===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+      });
+      ctx.stroke();
+    }
+
+    drawSeries("net", 200);
+    drawSeries("us", 20);
+
+    // legend
+    ctx.fillStyle = "rgba(233,238,246,.92)";
+    ctx.fillText("Total nettovinst", x0+8, y1+16);
+    ctx.fillStyle = `hsl(200 70% 55%)`;
+    ctx.fillRect(x0+130, y1+6, 14, 14);
+
+    ctx.fillStyle = "rgba(233,238,246,.92)";
+    ctx.fillText("USA netto", x0+170, y1+16);
+    ctx.fillStyle = `hsl(20 70% 55%)`;
+    ctx.fillRect(x0+242, y1+6, 14, 14);
+
+    ctx.fillStyle = "rgba(233,238,246,.75)";
+    ctx.fillText(`Pris (USD/fat) ~ ${minP.toFixed(0)} → ${maxP.toFixed(0)}`, x0, h-12);
+  }
+
+  function update(){
+    let p = getParams();
+    setValueLabels(p);
+
+    const res = compute(p);
+
+    $("kpi_us").textContent = fmtUSD(res.us);
+    $("kpi_profit").textContent = fmtUSD(res.net);
+
+    const perDayExport = res.exported / 365;
+    $("kpi_profit_note").textContent = `Export ≈ ${fmtNum(Math.round(perDayExport))} fat/dag. Effektivt pris: $${res.effPrice.toFixed(2)}/fat.`;
+    $("kpi_us_note").textContent = `USA-andel: ${res.shares.us.toFixed(1)}% av nettovinst.`;
+
+    $("t_export_bbl").textContent = fmtNum(Math.round(res.exported));
+    $("t_eff_price").textContent = `$${res.effPrice.toFixed(2)}`;
+
+    $("t_rev_crude").textContent = fmtUSD(res.revCrude);
+    $("t_ref_profit").textContent = fmtUSD(res.refProfit);
+    $("t_total_rev").textContent = fmtUSD(res.totalRev);
+
+    $("t_opex").textContent = fmtUSD(res.upstreamOpex);
+    $("t_transport").textContent = fmtUSD(res.transport);
+    $("t_ref_cost").textContent = fmtUSD(res.refCost);
+    $("t_capex").textContent = fmtUSD(res.capex);
+    $("t_infra").textContent = fmtUSD(res.infra);
+    $("t_total_cost").textContent = fmtUSD(res.totalCost);
+    $("t_net").textContent = fmtUSD(res.net);
+
+    $("alloc_pop").textContent = fmtUSD(res.pop);
+    $("alloc_us").textContent = fmtUSD(res.us);
+    $("alloc_state").textContent = fmtUSD(res.state);
+
+    const margin = res.totalRev !== 0 ? (res.net / res.totalRev) : 0;
+    let cls = "ok", msg = "Ser positivt ut.";
+    if (res.net < 0){ cls = "bad"; msg = "Underskott – justera pris/volym eller sänk kostnader/CAPEX."; }
+    else if (margin < 0.10){ cls = "warn"; msg = "Tunn marginal – modellen är känslig för pris/volym/kostnader."; }
+
+    $("healthNote").innerHTML = `Status: <span class="${cls}">${msg}</span> Nettomarginal ≈ ${fmtPct(margin*100)}.`;
+
+    drawPie(res);
+    drawLine(p);
+  }
+
+  function loadFromQuery(){
+    const qs = new URLSearchParams(location.search);
+    for (const k of sliders){
+      if (qs.has(k) && $(k)) $(k).value = qs.get(k);
+    }
+  }
+
+  function toQuery(){
+    const p = {};
+    sliders.forEach(k => p[k] = $(k).value);
+    const qs = new URLSearchParams(p).toString();
+    return `${location.origin}${location.pathname}?${qs}`;
+  }
+
+  sliders.forEach(id => $(id).addEventListener("input", update));
+
+  $("resetBtn").addEventListener("click", () => {
+    for (const k of sliders) $(k).value = baseline[k];
+    history.replaceState(null,"", location.pathname);
+    update();
+  });
+
+  $("copyLinkBtn").addEventListener("click", async () => {
+    const link = toQuery();
+    try {
+      await navigator.clipboard.writeText(link);
+      alert("Länk kopierad till urklipp!");
+    } catch {
+      prompt("Kopiera länken manuellt:", link);
+    }
+  });
+
+  // init
+  loadFromQuery();
+  update();
+</script>
+</body>
+</html>
